@@ -26,6 +26,10 @@ Run the setup script:
 ```bash
 ./.devcontainer/.vnc_utils/setup_vnc.sh
 ```
+After setup you will need to source your environment either by opening a new terminal or by sourcing your configuration file, e.g. if you are using bash:
+```bash
+source ~/.bashrc
+```
 
 ### **2️⃣ Start VNC**
 Run:
