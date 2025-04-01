@@ -24,7 +24,7 @@ In the `race_stack`, this functionality is integrated as a submodule inside the 
 ### **1️⃣ Setup VNC**
 Run the setup script:
 ```bash
-./.devcontainer/.vnc_utils/setup_vnc.sh
+./setup_vnc.sh
 ```
 After setup you will need to source your environment either by opening a new terminal or by sourcing your configuration file, e.g. if you are using bash:
 ```bash
@@ -34,7 +34,7 @@ source ~/.bashrc
 ### **2️⃣ Start VNC**
 Run:
 ```bash
-./.devcontainer/.vnc_utils/start_vnc.sh
+./start_vnc.sh
 ```
 ⚠ **Keep this terminal open** – closing it will stop the VNC session.
 
