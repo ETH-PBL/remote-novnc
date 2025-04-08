@@ -16,10 +16,10 @@ if [ -z "$HOSTNAME" ]; then
 fi
 
 # Adjust DISPLAY and VNC_PORT based on USER_ID
-export DISPLAY_NUM="$((1 + (USER_ID % 16)))"   # DISPLAY will be USER_ID % 100
-export DISPLAY=":$DISPLAY_NUM"
+export DISPLAY_NUM="$((1 + (USER_ID % 16)))"   # DISPLAY will be USER_ID % 16
+export DISPLAY=":$USER_ID"
 export VNC_PORT=$((10000 + USER_ID)) # VNC_PORT will be 10000 + USER_ID
-export NOVNC_PORT=$((20000 + USER_ID)) # VNC_PORT will be 10000 + USER_ID
+export NOVNC_PORT=$((20000 + USER_ID)) # VNC_PORT will be 20000 + USER_ID
 
 
 trap 'kill 0' SIGINT
@@ -27,15 +27,28 @@ trap 'kill 0' SIGINT
 echo "Starting DISPLAY=$DISPLAY VNC on http://$HOSTNAME:$NOVNC_PORT/vnc.html"
 
 # Create new virtual frame buffer
-Xvfb $DISPLAY -screen $DISPLAY_NUM 1920x1080x24 -listen tcp -ac &> /dev/null &
+Xvfb $DISPLAY -screen $DISPLAY_NUM 1920x1080x24 -listen tcp -ac &
+XVFB_PID=$!
+
+# Wait briefly to let it initialize
+sleep 1
+
+# Check if Xvfb is still running (i.e., it didn't crash)
+if ! kill -0 $XVFB_PID 2>/dev/null; then
+    echo "❌ Failed to start Xvfb on display $DISPLAY_NUM"
+    exit 1
+fi
 
 # Start the XFCE4 session
+echo "Starting XFCE4"
 xfce4-session &>> xfce.log &
 
 # Start the X11 VNC
+echo "Starting X11"
 x11vnc -display $DISPLAY -forever -shared -rfbport $VNC_PORT -usepw &>> x11.log &
 
 # Start the webserver
+echo "Starting Webserver"
 websockify --web /usr/share/novnc $NOVNC_PORT localhost:$VNC_PORT &>> websockify.log &
 
 wait
