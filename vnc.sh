@@ -4,7 +4,11 @@ USER_ID="${USER_ID:-$(id -u)}"  # Default to current user's ID if not set
 
 
 # Get hostname one-liner :D
-HOSTNAME=$(nslookup $(ip route show default | awk '{print $5}' | xargs -I {} ip addr show {} | grep 'inet ' | awk '{print $2}' | cut -d/ -f1 | head -n 1)  | grep -w 'name' | awk '{print $4}')
+# - Grabs default route interface (eg. eno1)
+# - Fetches the IP of the interface 192.168.x.x
+# - uses nslookup to check what the NAC entry for that IP is on the network
+# - Filter out stupid dot at the end
+HOSTNAME=$(nslookup $(ip route show default | awk '{print $5}' | xargs -I {} ip addr show {} | grep 'inet ' | awk '{print $2}' | cut -d/ -f1 | head -n 1)  | grep -w 'name' | awk '{print $4}' | sed 's/\.$//')
 
 
 if [ -z "$HOSTNAME" ]; then
