@@ -13,7 +13,6 @@ This system leverages:
 - **Xfce4**: A lightweight Linux desktop environment.
 - **x11vnc**: A VNC server for remote access.
 - **noVNC & websockify**: A web-based VNC client for browser-based access.
-- **Supervisor**: Process management to ensure services run reliably.
 
 In the `race_stack`, this functionality is integrated as a submodule inside the `.devcontainer` folder, but it can be used in a stand-alone way to connect to a graphical session also without the entire `race_stack`, just by cloning the code from the [main repo](https://git.ee.ethz.ch/pbl/research/f1tenth/remote-novnc-setup).
 
@@ -26,19 +25,21 @@ Run the setup script:
 ```bash
 ./setup_vnc.sh
 ```
-This will install all dependencies (if you are sudo) and propt you to set up a VNC password. 
-
-After setup you will need to source your environment either by opening a new terminal or by sourcing your configuration file, e.g. if you are using bash:
-```bash
-source ~/.bashrc
-```
+This will install all dependencies (if you are sudo) and propt you to set up a VNC password.
 
 ### **2️⃣ Start VNC**
 Run:
 ```bash
 ./start_vnc.sh
 ```
-⚠ **Keep this terminal open** – closing it will stop the VNC session.
+This should output something like:
+```
+Started VNC DISPLAY=:1001 SCREEN=10
+Local VNC: localhost:11001
+Remote NoVNC: http://server-name.ee.ethz.ch:21001/vnc.html
+```
+
+⚠ **Keep this terminal open** – closing it with `Ctrl-C` will stop the VNC session.
 
 ---
 
@@ -49,7 +50,7 @@ If you are running noVNC on your local machine inside WSL or a Docker container:
 
 1. Open a browser and go to:
    ```
-   http://localhost:8080/vnc.html
+   http://server-name.ee.ethz.ch:21001/vnc.html
    ```
 2. You should now see the remote Linux desktop.
 
