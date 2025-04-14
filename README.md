@@ -26,6 +26,8 @@ Run the setup script:
 ```bash
 ./setup_vnc.sh
 ```
+This will install all dependencies (if you are sudo) and propt you to set up a VNC password. 
+
 After setup you will need to source your environment either by opening a new terminal or by sourcing your configuration file, e.g. if you are using bash:
 ```bash
 source ~/.bashrc
