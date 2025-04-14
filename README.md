@@ -38,6 +38,8 @@ Started VNC DISPLAY=:1001 SCREEN=10
 Local VNC: localhost:11001
 Remote NoVNC: http://server-name.ee.ethz.ch:21001/vnc.html
 ```
+The port is derived based on your UID, thus it will likely be different to what is written in this README!
+
 
 ⚠ **Keep this terminal open** – closing it with `Ctrl-C` will stop the VNC session.
 
@@ -54,18 +56,4 @@ If you are running noVNC on your local machine inside WSL or a Docker container:
    ```
 2. You should now see the remote Linux desktop.
 
----
 
-### **🔹 Remote Access via SSH Tunnel**
-If you are connecting to a **remote machine**, ensure the initial setup is performed on that machine.
-
-Once the setup is complete, on your **local machine**, run:
-```bash
-ssh -L 5901:localhost:5900 -L 8080:localhost:8080 <remote-user>@<remote-ip>
-```
-This command establishes a secure tunnel between your local machine and the remote machine, forwarding the necessary ports for VNC and noVNC access.
-
-Now, access the VNC session at:
-```
-http://localhost:8080/vnc.html
-```
