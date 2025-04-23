@@ -21,6 +21,11 @@ export DISPLAY=":$USER_ID"
 export VNC_PORT=$((10000 + USER_ID)) # VNC_PORT will be 10000 + USER_ID
 export NOVNC_PORT=$((20000 + USER_ID)) # VNC_PORT will be 20000 + USER_ID
 
+# Kill any lingering processes from before
+pkill -u $USER_ID Xvfb
+pkill -u $USER_ID xfce4-session
+pkill -u $USER_ID websockify
+pkill -u $USER_ID x11vnc
 
 trap 'kill 0' SIGINT
 
