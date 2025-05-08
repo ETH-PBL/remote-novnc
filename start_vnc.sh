@@ -1,5 +1,8 @@
 #! /bin/bash
 
+# Get resolution from the first CLI argument, default to 1920x1080
+RESOLUTION="${1:-1920x1080}"
+
 USER_ID="${USER_ID:-$(id -u)}"  # Default to current user's ID if not set
 
 
@@ -32,7 +35,7 @@ trap 'kill 0' SIGINT
 echo "Starting DISPLAY=$DISPLAY VNC on http://$HOSTNAME:$NOVNC_PORT/vnc.html"
 
 # Create new virtual frame buffer
-Xvfb $DISPLAY -screen $DISPLAY_NUM 1920x1080x24 -listen tcp -ac &
+Xvfb $DISPLAY -screen 0 ${RESOLUTION}x24 -listen tcp -ac &
 XVFB_PID=$!
 
 # Wait briefly to let it initialize
