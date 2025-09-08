@@ -14,8 +14,6 @@ This system leverages:
 - **x11vnc**: A VNC server for remote access.
 - **noVNC & websockify**: A web-based VNC client for browser-based access.
 
-In the `race_stack`, this functionality is integrated as a submodule inside the `.devcontainer` folder, but it can be used in a stand-alone way to connect to a graphical session also without the entire `race_stack`, just by cloning the code from the [main repo](https://git.ee.ethz.ch/pbl/research/f1tenth/remote-novnc-setup).
-
 ---
 
 ## **Setup Instructions**
@@ -25,7 +23,7 @@ Run the setup script:
 ```bash
 ./setup_vnc.sh
 ```
-This will install all dependencies (if you are sudo) and propt you to set up a VNC password.
+This will install all dependencies (if you are sudo) and prompt you to set up a VNC password.
 
 ### **2️⃣ Start VNC**
 Run:
