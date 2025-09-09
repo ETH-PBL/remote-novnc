@@ -3,6 +3,12 @@
 BOLD="\033[1m"
 END_BOLD="\033[0m"
 
+if [[ "$(uname)" == "Darwin" ]]; then
+  echo "Running on macOS, building with Docker"
+  docker build -t novnc .
+  exit 1
+fi
+
 # use current folder
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 USER_SHELL=$(basename "$SHELL")

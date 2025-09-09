@@ -24,6 +24,7 @@ Run the setup script:
 ./setup_vnc.sh
 ```
 This will install all dependencies (if you are sudo) and prompt you to set up a VNC password.
+If you are on mac this will be setup in docker container. For this you need to install [docker](https://www.docker.com/get-started). 
 
 ### **2️⃣ Start VNC**
 Run:

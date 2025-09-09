@@ -1,11 +1,30 @@
 #! /bin/bash
 
+if [[ "$(uname)" == "Darwin" ]]; then
+    USERID=$(id -u)
+    PORT=$((20000 + USERID))
+
+    ports=(6000 10000 20000)
+    args=()
+    for port in "${ports[@]}"; do
+        PORTU=$((port + USERID))
+        args+=("-p" "$PORTU:$PORTU")
+    done
+
+    echo "Running on macOS, starting with Docker"
+    echo "You can access it under http://$(hostname):$PORT/vnc.html"
+    docker run --rm "${args[@]}" -e USER_ID=$USERID --name novnc novnc:latest
+    exit 1
+fi
+
 # Get resolution from the first CLI argument, default to 1920x1080
 RESOLUTION="${1:-1920x1080}"
 
-USER_ID="${USER_ID:-$(id -u)}"  # Default to current user's ID if not set
-
-
+if [ -f /.dockerenv ]; then
+    DOCKER=true
+else
+    DOCKER=false
+fi
 # Get hostname one-liner :D
 # - Grabs default route interface (eg. eno1)
 # - Fetches the IP of the interface 192.168.x.x
@@ -32,10 +51,14 @@ pkill -u $USER_ID x11vnc
 
 trap 'kill 0' SIGINT
 
-echo "Starting DISPLAY=$DISPLAY VNC on http://$HOSTNAME:$NOVNC_PORT/vnc.html"
+if $DOCKER; then
+    echo "Starting DISPLAY=$DISPLAY"
+else
+    echo "Starting DISPLAY=$DISPLAY VNC on http://$HOSTNAME:$NOVNC_PORT/vnc.html"
+fi
 
 # Create new virtual frame buffer
-Xvfb $DISPLAY -screen 0 ${RESOLUTION}x24 -listen tcp -ac &
+Xvfb $DISPLAY -screen 0 ${RESOLUTION}x24 -listen tcp -ac &>> xvfb.log &
 XVFB_PID=$!
 
 # Wait briefly to let it initialize
@@ -51,9 +74,31 @@ fi
 echo "Starting XFCE4"
 xfce4-session &>> xfce.log &
 
+if $DOCKER; then
+    # Wait briefly to let it initialize
+    sleep 5
+        # Disable screensaver
+    xfconf-query -c xfce4-screensaver -p /saver/enabled --create -t bool -s false || true
+
+    # Disable lock screen
+    xfconf-query -c xfce4-screensaver -p /lock/enabled --create -t bool -s false || true
+    xfconf-query -c xfce4-session -p /shutdown/LockScreen --create -t bool -s false || true
+
+    # Disable DPMS and screen blanking
+    xset s off || true
+    xset -dpms || true
+    xset s noblank || true
+
+    echo "[INFO] XFCE screensaver and lock screen disabled."
+fi
+
 # Start the X11 VNC
 echo "Starting X11"
-x11vnc -display $DISPLAY -forever -shared -rfbport $VNC_PORT -usepw &>> x11.log &
+if $DOCKER; then
+    x11vnc -display $DISPLAY -forever -shared -rfbport $VNC_PORT &>> x11.log &
+else 
+    x11vnc -display $DISPLAY -forever -shared -rfbport $VNC_PORT -usepw &>> x11.log &
+fi
 
 # Start the webserver
 echo "Starting Webserver"
