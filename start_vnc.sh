@@ -1,19 +1,19 @@
 #! /bin/bash
 
+USER_ID="${USER_ID:-$(id -u)}"
 if [[ "$(uname)" == "Darwin" ]]; then
-    USERID=$(id -u)
     PORT=$((20000 + USERID))
 
     ports=(6000 10000 20000)
     args=()
     for port in "${ports[@]}"; do
-        PORTU=$((port + USERID))
+        PORTU=$((port + USER_ID))
         args+=("-p" "$PORTU:$PORTU")
     done
 
     echo "Running on macOS, starting with Docker"
     echo "You can access it under http://$(hostname):$PORT/vnc.html"
-    docker run --rm "${args[@]}" -e USER_ID=$USERID --name novnc novnc:latest
+    docker run --rm "${args[@]}" -e USER_ID=$USER_ID --name novnc novnc:latest
     exit 1
 fi
 
