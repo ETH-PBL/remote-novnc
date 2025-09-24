@@ -2,7 +2,7 @@
 
 USER_ID="${USER_ID:-$(id -u)}"
 if [[ "$(uname)" == "Darwin" ]]; then
-    PORT=$((20000 + USERID))
+    PORT=$((20000 + USER_ID))
 
     ports=(6000 10000 20000)
     args=()
