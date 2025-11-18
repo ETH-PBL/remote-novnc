@@ -56,3 +56,64 @@ If you are running noVNC on your local machine inside WSL or a Docker container:
 2. You should now see the remote Linux desktop.
 
 
+---
+
+## **GPU acceleration with VirtualGL (NEEDS SUDO)**
+Sometimes you may want to run 3D applications inside the remote desktop with GPU acceleration. This can be achieved using [VirtualGL](https://virtualgl.org/), which redirects OpenGL commands from the remote X server to the host GPU.
+
+### If you have a physical monitor plugged in
+If you have already a monitor connected to the server with NVIDIA drivers installed, follow these steps:
+
+1. Identify `<your GPU display no.>` and ensure that the monitor is rendering with the NVIDIA GPU. You can verify this by running:
+   ```bash
+   DISPLAY=<your GPU display> glxinfo | grep renderer
+   ```
+   It should show the NVIDIA GPU as the renderer and not llvmpipe or similar.
+
+2. Install `vglrun` where you need to run the graphical application (for example only in a container):
+   ```bash
+   sudo wget https://github.com/VirtualGL/virtualgl/releases/download/3.1.4/virtualgl_3.1.4_amd64.deb && \
+      sudo dpkg -i virtualgl_3.1.4_amd64.deb && \
+      sudo rm virtualgl_3.1.4_amd64.deb
+   ```
+   Notice that a specific version is hardcoded, feel free to change it (check on github for newer releases). It is not on default repos for apt (anymore) at the moment of writing.
+
+3. Start your normal Xfce session:
+   ```bash
+   ./start_vnc.sh
+   ```
+   Note down the noVNC display number shown in the output!!
+
+4. When launching a normal OpenGL application that wants GPU accelerataion, prefix the command with `vglrun -d <your GPU display no.>`, e.g.:
+   ```bash
+   vglrun -d <your GPU display no.> rviz2
+   ```
+   you might actually need the VGL_DISPLAY variable set too, just run:
+   ```bash
+   VGL_DISPLAY=<your noVNC display> vglrun -d <your GPU display no.> rviz2
+   ```
+---
+
+### Headless NVIDIA GPU setup (if you don't have a physical monitor plugged in)
+Sometimes you may not have a physical monitor connected to your server. That's fine too, follow as below to setup a headless Xorg server with NVIDIA drivers:
+
+1. Create a new Xorg configuration for a headless display:
+   ```bash
+   sudo nvidia-xconfig \
+      --allow-empty-initial-configuration \
+      --use-display-device=None \
+      --virtual=1920x1080 \
+      --busid=$(nvidia-xconfig --query-gpu-info | grep 'BusID' | head -n1 | awk '{print $4}')
+   ```
+   Change resolution if you wish. This will create/modify `/etc/X11/xorg.conf` which is needed for VirtualGL to work.
+2. Start a headless Xorg server on an unused display, e.g. `:99`:
+   ```bash
+   sudo Xorg :99 -config /etc/X11/xorg.conf vt8
+   ```
+   You can verify that the Xorg server is running with:
+   ```bash
+   DISPLAY=:99 glxinfo | grep renderer
+   ```
+   It should show your NVIDIA GPU as the renderer.
+
+   Follow now the steps in the **GPU acceleration with VirtualGL** section above, using `:99` as `<your GPU display no.>`.
