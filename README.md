@@ -1,5 +1,7 @@
 # **Remote GUI Access with noVNC**
 
+**This can cause some problems on Ubuntu 26. Use the dockerized version**
+
 noVNC provides a browser-based VNC client, enabling seamless access to a remote Linux desktop environment. It allows users to run graphical applications on a headless server or a virtualized environment while interacting with them through a web browser. This setup eliminates the need for a local X server and provides a smooth remote desktop experience.
 
 This setup is particularly useful for:
