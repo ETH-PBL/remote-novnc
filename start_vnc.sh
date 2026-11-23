@@ -1,7 +1,22 @@
 #! /bin/bash
 
 USER_ID="${USER_ID:-$(id -u)}"
-if [[ "$(uname)" == "Darwin" ]]; then
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# First CLI argument: config name (configs/<name>.conf) or WxH resolution.
+# Configs are sourced and may set RESOLUTION and FORCE_DOCKER.
+if [ -f "$SCRIPT_DIR/configs/$1.conf" ]; then
+    source "$SCRIPT_DIR/configs/$1.conf"
+elif [[ "$1" =~ ^[0-9]+x[0-9]+$ ]]; then
+    RESOLUTION="$1"
+elif [ -n "$1" ]; then
+    echo "Unknown config '$1'. Available: $(ls "$SCRIPT_DIR/configs" 2>/dev/null | sed 's/\.conf$//' | xargs)"
+    exit 1
+fi
+RESOLUTION="${RESOLUTION:-1920x1080}"
+
+# Docker is used on macOS, or anywhere with FORCE_DOCKER=1
+if [ ! -f /.dockerenv ] && { [[ "$(uname)" == "Darwin" ]] || [[ "${FORCE_DOCKER:-0}" == "1" ]]; }; then
     PORT=$((20000 + USER_ID))
 
     ports=(6000 10000 20000)
@@ -11,14 +26,11 @@ if [[ "$(uname)" == "Darwin" ]]; then
         args+=("-p" "$PORTU:$PORTU")
     done
 
-    echo "Running on macOS, starting with Docker"
+    echo "Starting with Docker"
     echo "You can access it under http://$(hostname):$PORT/vnc.html"
-    docker run --rm "${args[@]}" -e USER_ID=$USER_ID --name novnc novnc:latest
-    exit 1
+    exec docker run --rm "${args[@]}" -e USER_ID=$USER_ID --name novnc novnc:latest /start_vnc.sh "$RESOLUTION"
 fi
 
-# Get resolution from the first CLI argument, default to 1920x1080
-RESOLUTION="${1:-1920x1080}"
 
 if [ -f /.dockerenv ]; then
     DOCKER=true

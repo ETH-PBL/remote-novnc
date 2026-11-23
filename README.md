@@ -37,6 +37,21 @@ Started VNC DISPLAY=:1001 SCREEN=10
 Local VNC: localhost:11001
 Remote NoVNC: http://server-name.ee.ethz.ch:21001/vnc.html
 ```
+#### Configs
+Pass a resolution or the name of a config in `configs/`:
+```bash
+./start_vnc.sh 1500x830   # explicit resolution
+./start_vnc.sh big        # sources configs/big.conf
+```
+A config is a sourced shell file that may set `RESOLUTION` and `FORCE_DOCKER`. Add your own as `configs/<name>.conf`.
+
+#### Force Docker
+Docker is used automatically on macOS. To use it on any machine, set `FORCE_DOCKER=1` (env or config) for both scripts:
+```bash
+FORCE_DOCKER=1 ./setup_vnc.sh
+FORCE_DOCKER=1 ./start_vnc.sh big
+```
+
 The port is derived based on your UID, thus it will likely be different to what is written in this README!
 
 

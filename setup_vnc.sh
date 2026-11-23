@@ -3,10 +3,10 @@
 BOLD="\033[1m"
 END_BOLD="\033[0m"
 
-if [[ "$(uname)" == "Darwin" ]]; then
-  echo "Running on macOS, building with Docker"
-  docker build -t novnc .
-  exit 1
+if [[ "$(uname)" == "Darwin" ]] || [[ "${FORCE_DOCKER:-0}" == "1" ]]; then
+  echo "Building with Docker"
+  docker build -t novnc "$(dirname "${BASH_SOURCE[0]}")"
+  exit 0
 fi
 
 # use current folder
